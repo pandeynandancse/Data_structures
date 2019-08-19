@@ -1,0 +1,154 @@
+#include <stdio.h>
+
+struct node
+{
+  struct node* left;
+  int key;
+  struct node* right;
+  struct node* parent;
+  
+};
+
+
+void inorder(struct node* root)
+{
+	if(root!=NULL){
+	inorder(root->left);
+	printf("%d",root->key);
+	inorder(root->right);
+	}
+}
+
+
+struct node* search(struct node*  root, int key)
+{
+	if(root->key==key || root==NULL){
+		return root;	
+	}
+	else{
+		if(root->key < key){
+			return search(root->right,key);
+		}
+		else{
+			return search(root->left,key);
+		}
+	}
+}
+
+int inordersucc(struct node* root, int key)
+{
+    if(root->key != key)
+    {
+        if(root->key > key){
+            inordersucc(root->left,key);
+        }
+        else{
+            inordersucc(root->right,key);
+        }
+    }
+    
+    else{
+        if(root->right!=NULL){
+            struct node * succ = root->right;
+            while(succ->left != NULL){
+                succ = succ->left;
+            }
+            return succ->key;
+        }
+        
+        else
+        {
+            struct node* n = root;
+            struct node  * p = n->parent;
+            while(p!=NULL && p->right == n){
+                n = p;
+                p = p->parent;
+            }
+            return p->key;
+        }
+    }
+}
+
+int inorderpred(struct node* root,  int key){
+    struct node* root2 = search(root,key);
+  
+    if(root2->left != NULL){
+        struct node* pred = root2->left;
+        while(pred->right!=NULL){
+            pred = pred->right;
+        }
+        return pred->key;
+    }
+    
+    
+    else{
+        struct node* n = root2;
+        struct node * p = n->parent;
+        while(p!=NULL && p->left == n){
+            n  = p;
+            p =p->parent;
+        }
+        return p->key;
+    }
+    
+}
+
+
+struct node* createnode(int key){
+    struct node* newnode = (struct node*) malloc(sizeof(struct node));
+    newnode->left=NULL;
+    newnode->key = key;
+    newnode->right=NULL;
+    newnode->parent=NULL;
+    return newnode;
+}
+
+
+
+struct node* insert(struct node* root, int key)
+{
+    if(root==NULL)
+    {
+        struct node* newnode = createnode(key);
+        root = newnode;
+        return root;
+        
+    }
+    
+    else{
+        if(root->key < key){
+            struct node* temp = insert(root->right,key);
+            root->right=temp;
+            temp->parent = root;
+            
+        }
+        else{
+            struct node* temp  = insert(root->left,key);
+            root->left=temp;
+            temp->parent = root;
+        }
+        return root;
+    }
+}
+
+int main()
+{
+    int i, keyi,siz;
+    struct node* root = NULL;
+    printf("Enter size ");
+    scanf("%d",&siz);
+    for(i=0;i<siz;i++){
+        scanf("%d",&keyi);
+        root = insert(root,keyi);
+    }
+    
+    inorder(root);
+    int succ = inordersucc(root,14);
+    printf("%d",succ);
+    printf("\n");
+    
+    int pred = inorderpred(root,10);
+    printf("%d",pred);
+    printf("\n");
+    return 0;
+}
