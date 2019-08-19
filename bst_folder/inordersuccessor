@@ -1,0 +1,120 @@
+#include <stdio.h>
+ 
+struct node
+{
+  struct node* left;
+  int key;
+  struct node* right;
+  struct node* parent;
+ 
+};
+ 
+ 
+void inorder(struct node* root)
+{
+	if(root!=NULL){
+	inorder(root->left);
+	printf("%d",root->key);
+	inorder(root->right);
+	}
+}
+ 
+ 
+struct node* search(struct node* root, int key)
+{
+	if(root==NULL || root->key ==key){
+		return root;
+ 
+	}
+	else{
+		if(root->key > key){
+			return search(root->left,key);
+		}
+		else{
+			return search(root->right,key);
+		}
+	}
+ 
+}
+ 
+int inordersucc(struct node* root, int key)
+{
+    struct node* root2 = search(root,key);
+ 
+    	printf("%d",root2->key);
+        if(root2->right!=NULL){
+            struct node * succ = root->right;
+            while(succ->left != NULL){
+                succ = succ->left;
+            }
+            return succ->key;
+        }
+ 
+        else
+        {
+            struct node* n = root2;
+            struct node* p = n->parent;
+            while(p!=NULL && p->right == n){
+                n = p;
+                p = p->parent;
+            }
+            return p->key;
+        }
+    }
+ 
+ 
+struct node* createnode(int key){
+    struct node* newnode = (struct node*) malloc(sizeof(struct node));
+    newnode->left=NULL;
+    newnode->key = key;
+    newnode->right=NULL;
+    newnode->parent=NULL;
+    return newnode;
+}
+ 
+ 
+ 
+struct node* insert(struct node* root, int key)
+{
+    if(root==NULL)
+    {
+        struct node* newnode = createnode(key);
+        root = newnode;
+        return root;
+ 
+    }
+ 
+    else{
+        if(root->key < key){
+            struct node* temp = insert(root->right,key);
+            root->right=temp;
+            temp->parent = root;
+ 
+        }
+        else{
+            struct node* temp  = insert(root->left,key);
+            root->left=temp;
+            temp->parent = root;
+        }
+        return root;
+    }
+}
+ 
+int main()
+{
+    int i, keyi,siz;
+    struct node* root = NULL;
+    printf("Enter size ");
+    scanf("%d",&siz);
+    for(i=0;i<siz;i++){
+        scanf("%d",&keyi);
+        root = insert(root,keyi);
+    }
+ 
+    inorder(root);
+    int succ = inordersucc(root,14);
+    printf("%d",succ);
+    printf("\n");
+ 
+    return 0;
+}
