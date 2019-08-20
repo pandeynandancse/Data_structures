@@ -1,0 +1,98 @@
+#include <stdio.h>
+#include<stdlib.h>
+
+struct Graph
+{
+    int V;
+    struct AdjList* arr;
+};
+
+
+struct AdjList
+{
+  struct AdjListNode* head;  
+};
+
+
+struct AdjListNode
+{
+    int data;
+    struct AdjListNode* next;
+};
+
+struct Graph* createGraph(struct Graph* graph, int v)
+{   
+    int i;
+    graph = (struct Graph*) malloc(sizeof(struct Graph));
+    graph->V = v;
+    graph->arr = (struct AdjList*)malloc(v * sizeof(struct AdjList));
+    for(i=0;i<v;i++)
+    {
+        graph->arr[i].head=NULL;
+    }
+    return graph;
+}
+
+
+struct AdjListNode * createNode(int dest)
+{
+    struct AdjListNode* newnode = (struct AdjListNode*)malloc(sizeof(struct AdjListNode));
+    newnode->data = dest;
+    newnode->next = NULL;
+    return newnode;
+}
+
+struct Graph* insertGraph(struct Graph* graph, int src, int dest )
+{   
+    
+    
+        struct AdjListNode* newnode = createNode(dest);
+        newnode->next = graph->arr[src].head;
+        graph->arr[src].head = newnode;
+        
+        
+        // add edge between dest to source
+        struct AdjListNode* newnodes = createNode(src);
+        newnodes->next = graph->arr[dest].head;
+        graph->arr[dest].head = newnodes;
+       
+    
+    return graph;    
+}
+
+
+void traverse(struct Graph* graph,int v)
+{   
+    struct AdjListNode* point;
+    for(int i=0; i<v;i++)
+    {
+        point = graph->arr[i].head;
+        while(point != NULL)
+        {
+            printf("%d",point->data);
+            point = point->next;
+        }
+        printf("\n");
+    }
+}
+
+int main()
+{
+    struct Graph* graph = NULL;
+    int v,edge,i,src,dest;
+    
+    printf("enter the number of vertex : ");
+    scanf("%d",&v);
+    printf("\n");
+    graph = createGraph(graph,v);
+    printf("Graph created\nNow enter number of edges");
+    scanf("%d",&edge);
+    for(i=0;i<edge;i++)
+    {
+        scanf("%d %d",&src,&dest);
+        graph = insertGraph(graph , src,dest);
+    }
+    
+    traverse(graph,v);
+    return 0;
+}
