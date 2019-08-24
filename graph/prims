@@ -1,0 +1,70 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<limits.h>
+#include<stdbool.h>
+#define V 5
+
+int minCost(int cost[V],bool visited[V])
+{   
+    int min = INT_MAX,min_index; 
+    for(int i=0;i<V;i++)
+    {
+        if(visited[i] == false && cost[i] < min)
+        {
+            min = cost[i];
+            min_index = i;
+        }
+    
+    }
+    return min_index;
+}
+
+void printMst(int parent[V], int graph[V][V])
+{
+    for(int i=1;i<V;i++)
+    {-
+        printf("%d is parent of %d and cost is %d\n",parent[i],i,graph[parent[i]][i]);
+    }
+}
+
+void primsMST(int graph[V][V])
+{   
+    bool visited[V];
+    int cost[V];
+    int parent[V];
+    for(int i=0;i<V;i++)   //// or use memset();
+    {
+        visited[i] = false;
+        cost[i] = INT_MAX;
+        
+    }
+    
+    cost[0] = 0;
+    parent[0] =-1;
+    for(int rep = 0; rep<V-1 ; rep++)
+    {
+        int u = minCost(cost,visited);
+        visited[u] = true;
+        
+        for(int v =0;v<V;v++)
+        {
+            if(visited[v] ==false && graph[u][v] && graph[u][v] <cost[v])
+            {
+                cost[v] = graph[u][v];
+                parent[v] = u;
+            }
+        }
+    }
+    printMst(parent,graph);
+}
+
+void main()
+{
+    int graph[V][V] = {{ 0, 2, 0, 6, 0 },  
+                        { 2, 0, 3, 8, 5 },  
+                        { 0, 3, 0, 0, 7 },  
+                        { 6, 8, 0, 0, 9 },  
+                        { 0, 5, 7, 9, 0 }};
+                    
+    primsMST(graph);
+}
