@@ -1,1 +1,60 @@
 
+#include<stdio.h>
+#include<stdlib.h>
+#include<limits.h>
+
+
+struct Graph
+{
+    int E,V;
+    struct Edge *edge;
+};
+
+struct Edge
+{
+    int src,dest;
+};
+
+
+struct Graph* createGraph(int v, int e)
+{
+    struct Graph* graph = (struct Graph*)malloc(sizeof(struct Graph));
+    graph->V = v;
+    graph->E = e;
+    graph->edge = (struct Edge*)malloc(e * sizeof(struct Edge));
+    return graph;
+}
+
+void insert(struct Graph* graph, int src,int dest, int i)
+{
+    graph->edge[i].src = src;
+    graph->edge[i].dest = dest;
+}
+
+void traverse(struct Graph* graph,int e)
+{
+    for(int i =0; i<e;i++)
+    {
+        printf("source is %d and destination is %d \n",graph->edge[i].src,graph->edge[i].dest);
+    }
+}
+
+int main()
+{   
+    int v,e,i,src,dest;
+    struct Graph *graph = NULL;
+    printf("Enter number of vertex and edges");
+    printf("\n");
+    scanf("%d %d",&v,&e);
+    graph = createGraph(v,e);
+    
+    for(i=0;i<e;i++)
+    {   printf("enter source and vertex");
+        scanf("%d %d",&src,&dest);
+        insert(graph,src,dest,i);
+    }
+    traverse(graph,e);
+    
+    
+    
+}
