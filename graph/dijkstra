@@ -1,0 +1,74 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<limits.h>
+#include<stdbool.h>
+#define V 9
+
+int minCost(int cost[V],bool visited[V])
+{   
+    int min = INT_MAX,min_index; 
+    for(int i=0;i<V;i++)
+    {
+        if(visited[i] == false && cost[i] < min)
+        {
+            min = cost[i];
+            min_index = i;
+        }
+    
+    }
+    return min_index;
+}
+
+void printMst(int cost[])
+{
+    for(int i=0;i<V;i++)
+    {
+        printf(" to %d and cost is %d\n",i,cost[i]);
+    }
+}
+
+void dijkstra(int graph[V][V],int src)
+{   
+    bool visited[V];
+    int cost[V];
+   // int parent[V];
+    for(int i=0;i<V;i++)   //// or use memset();
+    {
+        visited[i] = false;
+        cost[i] = INT_MAX;
+        
+    }
+    
+    cost[src] = 0;
+   // parent[0] =-1;
+    for(int rep = 0; rep<V-1 ; rep++)
+    {
+        int u = minCost(cost,visited);
+        visited[u] = true;
+        
+        for(int v =0;v<V;v++)
+        {
+            if(visited[v] ==false && graph[u][v] && cost[u] + graph[u][v] < cost[v])
+            {
+                cost[v] = graph[u][v] + cost[u];
+                
+            }
+        }
+    }
+    printMst(cost);
+}
+
+void main()
+{
+    int graph[V][V] = { { 0, 4, 0, 0, 0, 0, 0, 8, 0 },
+        { 4, 0, 8, 0, 0, 0, 0, 11, 0 }, 
+        { 0, 8, 0, 7, 0, 4, 0, 0, 2 }, 
+        { 0, 0, 7, 0, 9, 14, 0, 0, 0 },
+        { 0, 0, 0, 9, 0, 10, 0, 0, 0 }, 
+        { 0, 0, 4, 14, 10, 0, 2, 0, 0 },
+        { 0, 0, 0, 0, 0, 2, 0, 1, 6 }, 
+        { 8, 11, 0, 0, 0, 0, 1, 0, 7 }, 
+        { 0, 0, 2, 0, 0, 0, 6, 7, 0 } }; 
+                    
+    dijkstra(graph,0);
+}
