@@ -1,0 +1,50 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<stdbool.h>
+
+struct node
+{
+    bool isEndOfWord;
+    struct node* charact[26];   ///array of pointers
+};
+
+struct node* createNode()
+{   
+    struct node* head = (struct node*)malloc(sizeof(struct node));
+    for(int i=0;i<26;i++)
+    {
+        head->charact[i] = NULL;   
+    }
+    head->isEndOfWord = false;
+    return head;
+}
+
+struct node* insert(struct node* head, char data[])
+{   
+    
+    struct node* curr = head;
+    int length = strlen(data);
+    for(int i =0 ; i<length; i++)
+    {
+        if(curr->charact[data[i] - 'a'] == NULL)
+        {
+            curr->charact[data[i] - 'a'] = createNode();
+        }
+        
+        curr = curr->charact[data[i] - 'a'];
+    }   
+    
+    curr->isEndOfWord = true;
+    printf("done");
+    return head;
+}
+
+int main()
+{
+    struct node* head = createNode();
+    head = insert(head,"hello");
+    
+    return 0;
+    
+}
