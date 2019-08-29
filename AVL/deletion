@@ -1,0 +1,249 @@
+#include <stdio.h>
+#include<stdlib.h>
+typedef struct node
+{
+    struct node* left;
+    int data;
+    struct node* right;
+    struct node* parent;
+    //int height;
+}nodes;
+
+nodes* createNode(int num)
+{
+    nodes* newnode =  (nodes*)malloc(sizeof(nodes));
+    newnode->left=NULL;
+    newnode->data = num;
+    newnode->right = NULL;
+    newnode->parent = NULL;
+//    newnode->height = 1;
+    return newnode;
+}
+
+int height(nodes* node)
+{    
+    if(node ==NULL)
+        return 0;
+    else{
+    int left_height = height(node->left);
+    int right_height = height(node->right);
+    if (left_height > right_height)
+        return left_height + 1;
+    else
+        return right_height + 1;}
+}
+
+int getBalance(nodes* node)
+{
+    int balance = height(node->left) - height(node->right);
+    return balance;
+}
+
+nodes* rotateRight(nodes* root)
+{
+    nodes* temp1 = root;
+    nodes* temp = temp1->left->right;
+    root = root->left;
+    root->parent=NULL;
+    root->right = temp1;
+    root->right->parent = root;
+    root->right->left = temp;
+    if(root->right->left !=NULL)
+    	root->right->left->parent = root->right;
+    return root;    
+}
+
+nodes* rotateLeft(nodes* root)
+{    
+    
+    nodes* temp1 = root;
+    nodes* temp = temp1->right->left;
+    root = root->right;
+    root->parent = NULL;
+    root->left = temp1;
+    root->left->parent = root; 
+    root->left->right = temp;
+    if(root->left->right!=NULL){                       /////created segmentation fault.
+        root->left->right->parent = root->left;
+    }
+    
+    return root;    
+    //printf("%d",temp1);
+    //printf("%d",root);
+}
+
+nodes* insertInAvl(nodes* root,int num)
+{
+    if(root==NULL)
+    {
+        nodes* newnode = createNode(num);
+        root = newnode;
+        return root;
+        
+    }
+    
+    else{
+        if(num < root->data)
+        {
+            nodes* temp  = insertInAvl(root->left,num);
+            root->left = temp;
+            temp->parent = root;
+        }
+        
+        else if(num > root->data)
+        {
+            nodes* temp = insertInAvl(root->right,num);
+            root->right = temp;
+            temp->parent = root;
+        }
+        
+        int balance = getBalance(root);
+    //    printf("%d ",balance);    
+    
+      if(balance > 1  && num < root->left->data )
+        {
+            return rotateRight(root);
+        }
+        if(balance < -1  && num > root->right->data)
+        {
+            return rotateLeft(root);
+        }
+       if(balance > 1  && num > root->left->data )
+        {
+            
+            root->left = rotateLeft(root->left);
+            return rotateRight(root);
+        }
+        if(balance < -1  && num < root->right->data)
+        {
+            
+            root->right = rotateRight(root->right);
+            return rotateLeft(root);
+        }
+        return root;
+    }
+}
+
+nodes* deleted(nodes* root,int num)
+{
+	if(root==NULL)
+	{
+		return root;
+	}
+	
+	else{
+		if(num < root->data)
+		{
+			root->left = deleted(root->left,num);
+		}
+		else if(num > root->data)
+		{
+			root->right = deleted(root->right,num);
+		}
+		else
+		{
+			if(root->left==NULL)
+			{
+				nodes* temp = root->right;
+				free(root);
+				return(temp);
+			}
+			else if(root->right==NULL)
+			{
+				nodes* temp = root->left;
+				free(root);
+				return(temp);
+			}
+			nodes* succ = root->right;
+			while(succ->left!=NULL)
+			{
+				succ = succ->left;
+			}
+			
+			root->data = succ->data;
+			root->right = deleted(root->right,succ->data);
+			
+			
+			
+		}
+		
+		/*if(root== NULL)
+		{
+			return root;
+		}
+		*/
+		int balance = getBalance(root);
+			if(balance > 1)
+			    if(getBalance(root->left)<0)
+			    {   
+			        root->left = rotateLeft(root->left);
+					return rotateRight(root);
+			    }
+			    else if(getBalance(root->left)>=0)
+			    {
+			        	return rotateRight(root);
+			    }
+			else if(balance < -1 )
+			    if( getBalance(root->right)>0)
+			    {   
+			        root->right = rotateRight(root->right);
+				    return  rotateLeft(root);
+			    }
+			    else if(getBalance(root->right)<=0)
+			    {
+				    return rotateLeft(root);
+			    }
+		return root;
+	}
+	
+	
+}
+
+void inorder(nodes* root)
+{
+    if(root==NULL)
+        return;
+    inorder(root->left);
+    printf("%d ",root->data);
+    inorder(root->right);
+}
+
+int main(void) 
+{    //int num =0 ;
+    nodes* root = NULL;
+    /*while(num!=-1)
+    {    
+        scanf("%d",&num);
+        if(num==-1)
+            root = inertInAvl(root,num);
+            
+    }
+    */
+    root = insertInAvl(root, 10); 
+  root = insertInAvl(root, 20); 
+ root = insertInAvl(root, 30); 
+ root = insertInAvl(root, 40); 
+  root = insertInAvl(root, 50); 
+  root = insertInAvl(root, 25); 
+  inorder(root);
+  printf("\n");
+  root = deleted(root,25);
+  printf("\n");
+  inorder(root);
+ root =  deleted(root,30);
+  printf("\n");
+  inorder(root);
+ root =  deleted(root,40);
+    printf("\n");
+  inorder(root);
+root = deleted(root, 10);
+printf("\n");
+inorder(root);
+root = deleted(root,20);
+printf("\n");
+inorder(root);
+root = deleted(root,50);
+printf("\n");
+inorder(root);
+    return 0;
+}
