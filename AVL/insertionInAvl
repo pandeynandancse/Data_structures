@@ -1,157 +1,321 @@
-//create demo with 3 nodes for all 4 cases of rotation
-
-#include <stdio.h>
+#include<stdio.h>
 #include<stdlib.h>
-typedef struct node
+
+struct node
 {
     struct node* left;
     int data;
     struct node* right;
     struct node* parent;
-    //int height;
-}nodes;
+};
 
-nodes* createNode(int num)
+struct node* rotateRight(struct node* root)
 {
-    nodes* newnode =  (nodes*)malloc(sizeof(nodes));
-    newnode->left=NULL;
-    newnode->data = num;
+    struct node* temp = root;
+    root = root->left;
+    root->parent= temp->parent;
+	temp->left = root->right;
+	root->right = temp;
+	temp->parent = root;
+	temp->left->parent = temp;  
+    return root;
+};
+
+struct node* rotateLeft(struct node* root)
+{	
+    struct node* temp =root;
+    root = root->right;
+    root ->parent = temp->parent;
+    temp->right = root->left;
+    root->left=temp;
+    temp->parent = root;
+    temp->right->parent = temp;
+    return root;
+};
+
+struct node* createNode(int data)
+{
+    struct node* newnode = (struct node*)malloc(sizeof(struct node));
+    newnode->left = NULL;
+    newnode->data = data;
     newnode->right = NULL;
     newnode->parent = NULL;
-//    newnode->height = 1;
     return newnode;
-}
 
-int height(nodes* node)
-{    
-    if(node ==NULL)
+};
+
+int height(struct node* root)
+{
+    if(root == NULL)
+    {
         return 0;
-    else{
-    int left_height = height(node->left);
-    int right_height = height(node->right);
-    if (left_height > right_height)
-        return left_height + 1;
-    else
-        return right_height + 1;}
-}
-
-int getBalance(nodes* node)
-{
-    int balance = height(node->left) - height(node->right);
-    return balance;
-}
-
-nodes* rotateRight(nodes* root)
-{
-    nodes* temp1 = root;
-    nodes* temp = temp1->left->right;
-    root = root->left;
-    root->parent=NULL;
-    root->right = temp1;
-    root->right->parent = root;
-    root->right->left = temp;
-    if(root->right->left !=NULL)
-    	root->right->left->parent = root->right;
-    return root;    
-}
-
-nodes* rotateLeft(nodes* root)
-{    
-    
-    nodes* temp1 = root;
-    nodes* temp = temp1->right->left;
-    root = root->right;
-    root->parent = NULL;
-    root->left = temp1;
-    root->left->parent = root; 
-    root->left->right = temp;
-    if(root->left->right!=NULL){                       /////created segmentation fault.
-        root->left->right->parent = root->left;
     }
-    
-    return root;    
-    //printf("%d",temp1);
-    //printf("%d",root);
+    else
+    {
+        int lheight = height(root->left);
+        int rheight = height(root->right);
+        if(lheight > rheight)
+        {
+            return 1 + lheight;
+        }
+        else
+            return 1 + rheight;
+    }
 }
 
-nodes* insertInAvl(nodes* root,int num)
+int getBalance(struct node* root)
+{
+    int bal = height(root->left) - height(root->right);
+    return bal;
+}
+
+struct node* insert(struct node* root, int dataa)
 {
     if(root==NULL)
+        return createNode(dataa);
+
+    else
     {
-        nodes* newnode = createNode(num);
-        root = newnode;
-        return root;
-        
-    }
-    
-    else{
-        if(num < root->data)
+        if(root->data < dataa)
         {
-            nodes* temp  = insertInAvl(root->left,num);
-            root->left = temp;
-            temp->parent = root;
-        }
-        
-        else if(num > root->data)
-        {
-            nodes* temp = insertInAvl(root->right,num);
+            struct node* temp = insert(root->right,dataa);
             root->right = temp;
             temp->parent = root;
         }
-        
+
+        else if(root->data > dataa)
+        {
+
+            struct node* temp = insert(root->left,dataa);
+            root->left = temp;
+            temp->parent = root;
+
+        }
+
         int balance = getBalance(root);
-    //    printf("%d ",balance);    
-    
-      if(balance > 1  && num < root->left->data )
+
+        if(balance > 1)
         {
-            return rotateRight(root);
+            if(dataa < root->left->data)
+            {
+                return rotateRight(root);
+            }
+            if(dataa > root->left->data)
+            {
+                root->left = rotateLeft(root->left);
+                return rotateRight(root);
+
+            }
+
         }
-        if(balance < -1  && num > root->right->data)
+
+        if(balance < -1)
         {
-            return rotateLeft(root);
-        }
-       if(balance > 1  && num > root->left->data )
-        {
-            
-            root->left = rotateLeft(root->left);
-            return rotateRight(root);
-        }
-        if(balance < -1  && num < root->right->data)
-        {
-            
-            root->right = rotateRight(root->right);
-            return rotateLeft(root);
+           if(dataa > root->right->data)
+            {
+                return rotateLeft(root);
+            }
+            if(dataa < root->right->data)
+            {
+                root->right = rotateRight(root->right);
+                return rotateLeft(root);
+
+            }
         }
         return root;
     }
+
+
+};
+
+void inOrder(struct node* root)
+{	//printf("%d he",root->data);
+	if (root==NULL)
+		return ;
+    inOrder(root->left);
+    printf("%d",root->data);
+    printf("\n");
+    inOrder(root->right);
+
 }
 
-void inorder(nodes* root)
+void preOrder(struct node* root)
 {
-    if(root==NULL)
-        return;
-    inorder(root->left);
-    printf("%d ",root->data);
-    inorder(root->right);
+	if (root==NULL)
+		return;
+    printf("%d",root->data);
+    printf("\n");
+    preOrder(root->left);
+    preOrder(root->right);
+
 }
 
-int main(void) 
-{    //int num =0 ;
-    nodes* root = NULL;
-    /*while(num!=-1)
-    {    
-        scanf("%d",&num);
-        if(num==-1)
-            root = inertInAvl(root,num);
-            
+void postOrder(struct node* root)
+{
+	if (root==NULL)
+		return;
+    postOrder(root->left);
+    postOrder(root->right);
+    printf("%d",root->data);
+    printf("\n");
+
+}
+
+
+struct node* search(struct node* root , int data)
+{
+	if(root==NULL || root->data == data)
+		return root;
+	if(root->data < data)
+		return search(root->right,data);
+	return search(root->left,data);
+}
+
+struct node* deleted(struct node* root,int data)
+{
+
+	if (root==NULL)
+		return root;
+	if(root->data < data)
+		root->right = deleted(root->right,data);
+
+	else if(root->data > data)
+		root->left = deleted(root->left,data);
+
+	else
+    {
+		//struct node* deladd= search(root, data);
+		if(root->left == NULL){
+			struct node* temp = root->right;
+			free(root);
+			return temp;
+		}
+		else if(root->right == NULL)
+		{
+			struct node* temp = root->left;
+			free(root);
+			return temp;
+
+		}
+
+		else
+        {
+
+			struct node* suc = root->right;
+			while(suc->left != NULL){
+				suc = suc->left;
+			}
+			root->data = suc->data;
+			root->right = deleted(root->right,suc->data);
+		}
+	}
+
+	int balance = getBalance(root);
+	if(balance > 1)
+    {
+        if(getBalance(root->left) >= 0)
+        {
+            return rotateRight(root);
+        }
+        else if(getBalance(root->left) < 0)
+        {
+            root->left = rotateLeft(root->left);
+            return rotateRight(root);
+        }
     }
+
+    if(balance < -1)
+    {
+        if(getBalance(root->right) <= 0)
+        {
+            return rotateLeft(root);
+        }
+        else if(getBalance(root->right) > 0)
+        {
+            root->right = rotateRight(root->right);
+            return rotateLeft(root->left);
+        }
+    }
+	return root;
+}
+
+void main()
+{
+    int i,n,num=0,del=0,pr=0,choice,cont=0;
+    struct node* root = NULL;
+    while(cont != -1)
+
+    {
+	printf("Enter choice :");
+    printf("\n");
+    printf("0 for insert");
+    printf("\n");
+    printf("1 for inorder traversal :");
+    printf("\n");
+    printf("2 pre order traversal");
+    printf("\n");
+    printf("3 post order traversal");
+    printf("\n");
+    printf("4 Deletion");
+    printf("\n");
+    printf("-1 for exit");
+    printf("\n");scanf("%d",&choice);
+    	switch(choice){
+    	case 0:
+    	while(num !=-1)
+    {
+        printf("Enter the  node or press -1 to exit");
+        printf("\n");
+        scanf("%d",&num);
+        if(num !=-1)
+        	root = insert(root,num);
+    }
+
+    break;
+    case 1 :
+    printf("In Order Traversal :");
+    printf("\n");
+    inOrder(root);
+	break;
+
+	case 2:
+    printf("Pre Order Traversal :");
+    printf("\n");
+    preOrder(root);
+	break;
+
+	case 3:
+    printf("Post Order Traversal : ");
+    printf("\n");
+    postOrder(root);
+	break;
+
+	case 4:
+	
+		del=0;
+    while(del != -1)
+    {
+        printf("Enter number to be deleted : ");
+        scanf("%d",&del);
+		root = deleted(root,del);
+		printf("Inorder Traversal after deleting node");
+		printf("\n");
+		inOrder(root);
+
+    }
+    break;
+	}
+    printf("Do you want to continue: Enter something except -1");
+    printf("\n");
+    scanf("%d",&cont);
+	}
+
+    /*while(pr!=0)
+    {	printf("Enter number whose Inorder Predecessor and Successor has to be find");
+    	scanf
+    	printf("Inorder predecessor of ")
+    	inOrderPredecessor(root);
+	}
     */
-    root = insertInAvl(root, 10); 
-  root = insertInAvl(root, 20); 
- root = insertInAvl(root, 30); 
- root = insertInAvl(root, 40); 
-  root = insertInAvl(root, 50); 
-  root = insertInAvl(root, 25); 
-  inorder(root);
-    return 0;
+
 }
