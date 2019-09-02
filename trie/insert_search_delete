@@ -1,0 +1,129 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<stdbool.h>
+
+struct node
+{
+    bool isEndOfWord;
+    struct node * charact[26];   ///array of pointers
+};
+
+struct node* createNode()
+{   int i;
+    struct node* head = (struct node*)malloc(sizeof(struct node));
+    for(i=0;i<26;i++)
+    {
+        head->charact[i] = NULL;   
+    }
+    head->isEndOfWord = false;
+    return head;
+}
+
+bool isEmpty(struct node* head)
+{    int i;
+    for(i =0; i<26;i++)
+    {
+        if(head->charact[i] != NULL)
+        {
+            return false;
+        }
+        
+    }    
+    return true;
+}
+
+struct node* deleted(struct node* head, char strin[],  int depth)
+{
+    if(head == NULL)
+    {
+        return NULL;
+    }
+    if(depth == strlen(strin))
+    {
+        if(head->isEndOfWord == true)
+        {
+            head->isEndOfWord = false;
+        
+        }
+        if(isEmpty(head))
+        {    
+            free(head);
+            head = NULL;
+            
+        } printf("DELETED");
+        return head;
+       
+    }
+    head -> charact[strin[depth]- 'a'] = deleted(head->charact[strin[depth] - 'a'] , strin, depth+1);
+    if(isEmpty(head) && head->isEndOfWord == false)
+    {
+        free(head);
+        head = NULL;
+    }
+    return head;
+    
+}
+
+bool search(struct node* head, char strin[])
+{     
+    int i;
+    int length = strlen(strin);
+    if(head == NULL)
+        return false;
+    for(i =0;i<length ; i++)
+    {
+        if(head->charact[strin[i] - 'a'] == NULL)
+        {
+            return false;
+        }
+        head = head->charact[strin[i] - 'a'];
+    }
+    if(head->isEndOfWord == true)
+    {
+        return true;
+    }
+    return ;
+}
+
+struct node* insert(struct node* head, char data[])
+{  
+    int i;
+    struct node* curr = head;
+    int length = strlen(data);
+    for(i =0 ; i<length; i++)
+    {
+        if(curr->charact[data[i] - 'a'] == NULL)
+        {
+            curr->charact[data[i] - 'a'] = createNode();
+            
+        }       
+        curr = curr->charact[data[i] - 'a'];
+    }   
+   
+    curr->isEndOfWord = true;
+    return head;
+}
+
+int main()
+{
+    struct node* head = createNode();
+    head = insert(head,"he"); 
+    head = insert(head,"is"); 
+    head = insert(head,"going"); 
+    head = insert(head,"there"); 
+    head = insert(head,"today"); 
+    bool searc = search(head,"toay");
+   if(searc == true)
+    {
+        printf("1");
+    }
+    else
+    {
+        printf("0");
+    }
+    
+   head = deleted(head,"there",0);
+    return 0;
+    
+}
