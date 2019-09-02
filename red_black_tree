@@ -1,0 +1,117 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<stdbool.h>
+ 
+ // 1 for black and 0 for red
+ 
+struct node
+{
+    int data;
+    struct node* left;
+    struct node* right;
+    struct node* parent;
+    int color;
+    
+};
+
+struct node* createNode(int data)
+{
+    struct node* newnode = (struct node*)malloc(sizeof(struct node));
+    newnode->data = data;
+    newnode->left = NULL;
+    newnode->right = NULL;
+    newnode->parent = NULL;
+    newnode->color = 0;  // red node;
+    return newnode;
+}
+
+
+struct node* fixingProblem(struct node* root)
+{
+    if(root->left != NULL && root->left->color == 0)
+    {   
+        if(root->left->left)             // root's left exist
+            if(root->left->left->color == 0)  // root's left left color is 0
+            {
+                if(root->right == 0)  // if root's left left i.e. newnode's color is red
+                {
+                    root->left->color =1;
+                    root->right = 1;
+                }
+            }
+        else if(root->left->right)          //// if root's right exists
+            if(root->left->right->color == 0)   //if root's left right color is 0
+            {
+                if(root->right == 0)  // if root's left left i.e. newnode's color is red
+                {
+                    root->left->color =1;
+                    root->right = 1;
+                }
+            }
+    }
+    
+    
+    else if(root->right != NULL && root->right->color == 0)
+    {   
+        if(root->right->left)             // root's left exist
+            if(root->right->left->color == 0)  // root's left left color is 0
+            {
+                if(root->left == 0)  // if root's left left i.e. newnode's color is red
+                {
+                    root->left->color =1;
+                    root->right = 1;
+                }
+            }
+        else if(root->right->right)          //// if root's right exists
+            if(root->right->right->color == 0)   //if root's left right color is 0
+            {
+                if(root->left == 0)  // if root's left left i.e. newnode's color is red
+                {
+                    root->left->color =1;
+                    root->right = 1;
+                }
+            }
+    }
+    
+    
+}
+
+struct node* insertInRBTree(struct node* root, int data)
+{
+    
+    
+    if(root == NULL)
+    {
+        struct node* newnode = createNode(data);
+        root = newnode;
+        root->color = 1; // doing black;
+        return root;
+    }
+    else
+    {
+        if(data < root->data)
+        {
+            struct node* temp = insertInRBTree(root,data);
+            root->left = temp;
+            temp->parent = root;
+        }
+        if(data > root->data)
+        {
+            struct node* temp  = insertInRBTree(root,data);
+            root->right = temp;
+            temp->parent = root;
+        }
+        
+        root->color = 0; //doing red
+        root = fixingProblem(root);
+        return root;
+    }
+}
+
+int main()
+{
+  struct node* root =NULL;
+  
+  
+}
